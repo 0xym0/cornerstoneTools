@@ -7,6 +7,7 @@
         if (options && options.fireOnTouchStart === true) {
             events += ' CornerstoneToolsTouchStart';
         }
+
         var toolInterface = {
             activate: function(element) {
                 $(element).off(events, touchDragCallback);

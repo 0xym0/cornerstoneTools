@@ -386,7 +386,6 @@
 
         mc.on('press tap doubletap panstart panmove panend pinchstart pinch rotate', onTouch);
 
-
         $(element).data('hammer', mc);
         $(element).on('touchstart touchend', onTouch);
         cornerstoneTools.preventGhostClick(element);

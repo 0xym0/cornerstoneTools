@@ -42,6 +42,7 @@
             $(eventData.element).on('CornerstoneToolsDragEnd', dragEndCallback);
             $(eventData.element).on('CornerstoneToolsTouchEnd', dragEndCallback);
         }
+
         return false; // false = causes jquery to preventDefault() and stopPropagation() this event
     }
 
@@ -99,6 +100,7 @@
             magnify.style.top = canvasLocation.y - 0.5 * magnifySize + 'px';
             magnify.style.left = canvasLocation.x - 0.5 * magnifySize + 'px';
         }
+
         magnify.style.display = 'block';
 
         // Hide the mouse cursor, so the user can see better
@@ -176,6 +178,5 @@
         disableCallback: removeMagnificationCanvas
     };
     cornerstoneTools.magnifyTouchDrag = cornerstoneTools.touchDragTool(dragCallback, options);
-
 
 })($, cornerstone, cornerstoneTools);
