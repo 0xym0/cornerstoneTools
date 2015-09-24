@@ -2,21 +2,33 @@
 
     'use strict';
 
-    function touchDragTool(touchDragCallback, fireOnTouchStart) {
+    function touchDragTool(touchDragCallback, options) {
         var events = 'CornerstoneToolsTouchDrag';
-        if (fireOnTouchStart === true) {
+        if (options && options.fireOnTouchStart === true) {
             events += ' CornerstoneToolsTouchStart';
         }
         var toolInterface = {
             activate: function(element) {
                 $(element).off(events, touchDragCallback);
                 $(element).on(events, touchDragCallback);
+                if (options && options.activateCallback) {
+                    options.activateCallback(element);
+                }
             }, disable: function(element) {
                 $(element).off(events, touchDragCallback);
+                if (options && options.disableCallback) {
+                    options.disableCallback(element);
+                }
             }, enable: function(element) {
                 $(element).off(events, touchDragCallback);
+                if (options && options.enableCallback) {
+                    options.enableCallback(element);
+                }
             }, deactivate: function(element) {
                 $(element).off(events, touchDragCallback);
+                if (options && options.deactivateCallback) {
+                    options.deactivateCallback(element);
+                }
             }
         };
         return toolInterface;
