@@ -1,4 +1,4 @@
-/*! cornerstoneTools - v0.7.6 - 2015-09-25 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+/*! cornerstoneTools - v0.7.6 - 2015-09-28 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -700,11 +700,11 @@ if (typeof cornerstoneTools === 'undefined') {
         });
         
         // we want to detect both the same time
-        pinch.requireFailure(pan);
+        pinch.recognizeWith(pan);
         pinch.recognizeWith(rotate);
 
         // add to the Manager
-        mc.add([ pan, press, rotate, pinch]);
+        mc.add([ pan, press, rotate, pinch ]);
         mc.on('press tap doubletap panstart panmove panend pinchstart pinchmove rotatemove', onTouch);
 
         $(element).data('hammer', mc);
