@@ -10,9 +10,9 @@
                 };
                 $(element).on('CornerstoneToolsMouseWheel', eventData, mouseWheelCallback);
             },
- disable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
- enable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
- deactivate: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);}
+            disable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
+            enable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
+            deactivate: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);}
         };
         return toolInterface;
     }

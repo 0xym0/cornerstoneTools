@@ -1,4 +1,4 @@
-/*! cornerstoneTools - v0.7.6 - 2015-10-06 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+/*! cornerstoneTools - v0.7.6 - 2015-10-07 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -1237,9 +1237,9 @@ if (typeof cornerstoneTools === 'undefined') {
                 };
                 $(element).on('CornerstoneToolsMouseWheel', eventData, mouseWheelCallback);
             },
- disable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
- enable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
- deactivate: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);}
+            disable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
+            enable: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);},
+            deactivate: function(element) {$(element).off('CornerstoneToolsMouseWheel', mouseWheelCallback);}
         };
         return toolInterface;
     }
@@ -2506,9 +2506,11 @@ if (typeof cornerstoneTools === 'undefined') {
     }
 
     function minimalStrategy(eventData) {
-        var enabledElement = cornerstone.getEnabledElement(eventData.element);
+        var element = eventData.element;
+        var enabledElement = cornerstone.getEnabledElement(element);
+        var image = enabledElement.image;
 
-        cornerstone.updateImage(eventData.element);
+        cornerstone.updateImage(element);
 
         var context = enabledElement.canvas.getContext('2d');
         context.setTransform(1, 0, 0, 1, 0, 0);
@@ -2518,27 +2520,35 @@ if (typeof cornerstoneTools === 'undefined') {
 
         context.save();
 
-        var x = Math.round(eventData.currentPoints.image.x);
-        var y = Math.round(eventData.currentPoints.image.y);
+        var toolCoords;
+        if (eventData.isTouchEvent === true) {
+            toolCoords = {
+                x: eventData.currentPoints.image.x,
+                y: eventData.currentPoints.image.y - cornerstoneTools.textStyle.getFontSize() * 2
+            };
+        } else {
+            toolCoords = eventData.currentPoints.image;
+        }
 
         var storedPixels;
         var text;
 
-        if (x < 0 || y < 0 || x >= eventData.image.columns || y >= eventData.image.rows) {
+        if (toolCoords.x < 0 || toolCoords.y < 0 ||
+            toolCoords.x >= image.columns || toolCoords.y >= image.rows) {
             return;
         }
         
-        if (eventData.image.color) {
-            storedPixels = cornerstone.getStoredPixels(eventData.element, x, y, 3, 1);
+        if (image.color) {
+            storedPixels = cornerstone.getStoredPixels(element, toolCoords.x, toolCoords.y, 3, 1);
             text = 'R: ' + storedPixels[0] + ' G: ' + storedPixels[1] + ' B: ' + storedPixels[2];
         } else {
-            storedPixels = cornerstone.getStoredPixels(eventData.element, x, y, 1, 1);
-            var huValue = storedPixels[0] * eventData.image.slope + eventData.image.intercept;
+            storedPixels = cornerstone.getStoredPixels(element, toolCoords.x, toolCoords.y, 1, 1);
+            var huValue = storedPixels[0] * image.slope + image.intercept;
             text = parseFloat(huValue.toFixed(3));
         }
 
         // Prepare text
-        var textCoords = cornerstone.pixelToCanvas(eventData.element, eventData.currentPoints.image);
+        var textCoords = cornerstone.pixelToCanvas(element, toolCoords);
         context.font = font;
         context.fillStyle = color;
 
@@ -2548,8 +2558,15 @@ if (typeof cornerstoneTools === 'undefined') {
             var width = context.measureText(text).width;
             translation = {
                 x: -width / 2 - 5,
-                y: -cornerstoneTools.textStyle.getFontSize() * 4
+                y: -cornerstoneTools.textStyle.getFontSize() * 1.5
             };
+
+            var handleRadius = 6;
+
+            context.beginPath();
+            context.strokeStyle = color;
+            context.arc(textCoords.x, textCoords.y, handleRadius, 0, 2 * Math.PI);
+            context.stroke();
         } else {
             translation = {
                 x: 4,
@@ -2791,7 +2808,10 @@ if (typeof cornerstoneTools === 'undefined') {
             
             context.font = font;
 
-            var textX, textY, meanStdDev, area, areaText, textSize;
+            var textX,
+                textY,
+                area,
+                meanStdDev;
 
             if (!data.invalidated) {
                 textX = data.textX;
@@ -2827,22 +2847,31 @@ if (typeof cornerstoneTools === 'undefined') {
                     data.meanStdDev = meanStdDev;
                 }
             }
+
             // Draw text
+
+            var areaText,
+                areaTextWidth;
             if (area !== undefined) {
                 areaText = 'Area: ' + area.toFixed(2) + ' mm' + String.fromCharCode(178);
-                textSize = context.measureText(areaText);
-            } else {
-                var stdDevText = 'StdDev: ' + meanStdDev.stdDev.toFixed(2);
-                textSize = context.measureText(stdDevText);
+                areaTextWidth = context.measureText(areaText).width;
             }
 
-            textX = centerX < (eventData.image.columns / 2) ? centerX + (widthCanvas / 2): centerX - (widthCanvas / 2) - textSize.width;
+            var meanText = 'Mean: ' + meanStdDev.mean.toFixed(2);
+            var meanTextWidth = context.measureText(meanText).width;
+
+            var stdDevText = 'StdDev: ' + meanStdDev.stdDev.toFixed(2);
+            var stdDevTextWidth = context.measureText(stdDevText).width;
+
+            var longestTextWidth = Math.max(meanTextWidth, areaTextWidth, stdDevTextWidth);
+
+            textX = centerX < (eventData.image.columns / 2) ? centerX + (widthCanvas / 2) + longestTextWidth: centerX - (widthCanvas / 2) - longestTextWidth - 5;
             textY = centerY < (eventData.image.rows / 2) ? centerY + (heightCanvas / 2): centerY - (heightCanvas / 2);
 
             context.fillStyle = color;
             if (meanStdDev) {
-                cornerstoneTools.drawTextBox(context, 'Mean: ' + meanStdDev.mean.toFixed(2), textX, textY - fontHeight - 5, color);
-                cornerstoneTools.drawTextBox(context, 'StdDev: ' + meanStdDev.stdDev.toFixed(2), textX, textY, color);
+                cornerstoneTools.drawTextBox(context, meanText, textX, textY - fontHeight - 5, color);
+                cornerstoneTools.drawTextBox(context, stdDevText, textX, textY, color);
             }
             
             // Char code 178 is a superscript 2 for mm^2
@@ -3874,15 +3903,20 @@ if (typeof cornerstoneTools === 'undefined') {
             activate: function(element) {
                 $(element).off(events, touchDragCallback);
                 $(element).on(events, touchDragCallback);
-            }, disable: function(element) {
+            },
+            disable: function(element) {
                 $(element).off(events, touchDragCallback);
-            }, enable: function(element) {
+            },
+            enable: function(element) {
                 $(element).off(events, touchDragCallback);
-            }, deactivate: function(element) {
+            },
+            deactivate: function(element) {
                 $(element).off(events, touchDragCallback);
-            }, getConfiguration: function() {
+            },
+            getConfiguration: function() {
                 return configuration;
-            }, setConfiguration: function(config) {
+            },
+            setConfiguration: function(config) {
                 configuration = config;
             }
         };
@@ -3916,7 +3950,10 @@ if (typeof cornerstoneTools === 'undefined') {
         var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
 
         return {
-            top: oppositeColumnString, bottom: columnString, left: oppositeRowString, right: rowString
+            top: oppositeColumnString,
+            bottom: columnString,
+            left: oppositeRowString,
+            right: rowString
         };
     }
 
@@ -3925,27 +3962,34 @@ if (typeof cornerstoneTools === 'undefined') {
         var coords;
 
         coords = {
-            x: enabledElement.image.width / 2, y: 5
+            x: enabledElement.image.width / 2,
+            y: 5
         };
         var topCoords = cornerstone.pixelToCanvas(element, coords);
 
         coords = {
-            x: enabledElement.image.width / 2, y: enabledElement.image.height - 5
+            x: enabledElement.image.width / 2,
+            y: enabledElement.image.height - 5
         };
         var bottomCoords = cornerstone.pixelToCanvas(element, coords);
 
         coords = {
-            x: 5, y: enabledElement.image.height / 2
+            x: 5,
+            y: enabledElement.image.height / 2
         };
         var leftCoords = cornerstone.pixelToCanvas(element, coords);
 
         coords = {
-            x: enabledElement.image.width - 10, y: enabledElement.image.height / 2
+            x: enabledElement.image.width - 10,
+            y: enabledElement.image.height / 2
         };
         var rightCoords = cornerstone.pixelToCanvas(element, coords);
 
         return {
-            top: topCoords, bottom: bottomCoords, left: leftCoords, right: rightCoords
+            top: topCoords,
+            bottom: bottomCoords,
+            left: leftCoords,
+            right: rightCoords
         };
     }
 
@@ -3966,7 +4010,10 @@ if (typeof cornerstoneTools === 'undefined') {
         var color = cornerstoneTools.toolColors.getToolColor();
 
         var textWidths = {
-            top: context.measureText(markers.top).width, left: context.measureText(markers.left).width, right: context.measureText(markers.right).width, bottom: context.measureText(markers.bottom).width
+            top: context.measureText(markers.top).width,
+            left: context.measureText(markers.left).width,
+            right: context.measureText(markers.right).width,
+            bottom: context.measureText(markers.bottom).width
         };
 
         cornerstoneTools.drawTextBox(context, markers.top, coords.top.x - textWidths.top / 2, coords.top.y, color);
@@ -4058,9 +4105,14 @@ if (typeof cornerstoneTools === 'undefined') {
     function createNewMeasurement(mouseEventData) {
         // create the measurement data for this tool with the end handle activated
         var measurementData = {
-            visible: true, active: true, handles: {
+            visible: true,
+            active: true,
+            handles: {
                 end: {
-                    x: mouseEventData.currentPoints.image.x, y: mouseEventData.currentPoints.image.y, highlight: true, active: true
+                    x: mouseEventData.currentPoints.image.x,
+                    y: mouseEventData.currentPoints.image.y,
+                    highlight: true,
+                    active: true
                 }
             }
         };
@@ -4134,7 +4186,8 @@ if (typeof cornerstoneTools === 'undefined') {
 
             var coords = {
                 // translate the x/y away from the cursor
-                x: data.handles.end.x + 3, y: data.handles.end.y - 3
+                x: data.handles.end.x + 3,
+                y: data.handles.end.y - 3
             };
             var textCoords = cornerstone.pixelToCanvas(eventData.element, coords);
             
@@ -4150,10 +4203,16 @@ if (typeof cornerstoneTools === 'undefined') {
 
     // module exports
     cornerstoneTools.probe = cornerstoneTools.mouseButtonTool({
-        createNewMeasurement: createNewMeasurement, onImageRendered: onImageRendered, pointNearTool: pointNearTool, toolType: toolType
+        createNewMeasurement: createNewMeasurement,
+        onImageRendered: onImageRendered,
+        pointNearTool: pointNearTool,
+        toolType: toolType
     });
     cornerstoneTools.probeTouch = cornerstoneTools.touchTool({
-        createNewMeasurement: createNewMeasurement, onImageRendered: onImageRendered, pointNearTool: pointNearTool, toolType: toolType
+        createNewMeasurement: createNewMeasurement,
+        onImageRendered: onImageRendered,
+        pointNearTool: pointNearTool,
+        toolType: toolType
     });
 
 })($, cornerstone, cornerstoneTools);
@@ -4171,11 +4230,20 @@ if (typeof cornerstoneTools === 'undefined') {
     function createNewMeasurement(mouseEventData) {
         // create the measurement data for this tool with the end handle activated
         var measurementData = {
-            visible: true, active: true, handles: {
+            visible: true,
+            active: true,
+            handles: {
                 start: {
-                    x: mouseEventData.currentPoints.image.x, y: mouseEventData.currentPoints.image.y, highlight: true, active: false
-                }, end: {
-                    x: mouseEventData.currentPoints.image.x, y: mouseEventData.currentPoints.image.y, highlight: true, active: true
+                    x: mouseEventData.currentPoints.image.x,
+                    y: mouseEventData.currentPoints.image.y,
+                    highlight: true,
+                    active: false
+                },
+                end: {
+                    x: mouseEventData.currentPoints.image.x,
+                    y: mouseEventData.currentPoints.image.y,
+                    highlight: true,
+                    active: true
                 }
             }
         };
@@ -4189,7 +4257,10 @@ if (typeof cornerstoneTools === 'undefined') {
         var endCanvas = cornerstone.pixelToCanvas(element, data.handles.end);
 
         var rect = {
-            left: Math.min(startCanvas.x, endCanvas.x), top: Math.min(startCanvas.y, endCanvas.y), width: Math.abs(startCanvas.x - endCanvas.x), height: Math.abs(startCanvas.y - endCanvas.y)
+            left: Math.min(startCanvas.x, endCanvas.x),
+            top: Math.min(startCanvas.y, endCanvas.y),
+            width: Math.abs(startCanvas.x - endCanvas.x),
+            height: Math.abs(startCanvas.y - endCanvas.y)
         };
 
         var distanceToPoint = cornerstoneMath.rect.distanceToPoint(rect, coords);
@@ -4217,7 +4288,10 @@ if (typeof cornerstoneTools === 'undefined') {
 
         if (count === 0) {
             return {
-                count: count, mean: 0.0, variance: 0.0, stdDev: 0.0
+                count: count,
+                mean: 0.0,
+                variance: 0.0,
+                stdDev: 0.0
             };
         }
 
@@ -4225,7 +4299,10 @@ if (typeof cornerstoneTools === 'undefined') {
         var variance = sumSquared / count - mean * mean;
 
         return {
-            count: count, mean: mean, variance: variance, stdDev: Math.sqrt(variance)
+            count: count,
+            mean: mean,
+            variance: variance,
+            stdDev: Math.sqrt(variance)
         };
     }
 
@@ -4289,7 +4366,10 @@ if (typeof cornerstoneTools === 'undefined') {
             var pixels = cornerstone.getPixels(eventData.element, left, top, width, height);
 
             var ellipse = {
-                left: left, top: top, width: width, height: height
+                left: left,
+                top: top,
+                width: width,
+                height: height
             };
 
             var meanStdDev = calculateMeanStdDev(pixels, ellipse);
@@ -4315,10 +4395,16 @@ if (typeof cornerstoneTools === 'undefined') {
 
     // module exports
     cornerstoneTools.rectangleRoi = cornerstoneTools.mouseButtonTool({
-        createNewMeasurement: createNewMeasurement, onImageRendered: onImageRendered, pointNearTool: pointNearTool, toolType: toolType
+        createNewMeasurement: createNewMeasurement,
+        onImageRendered: onImageRendered,
+        pointNearTool: pointNearTool,
+        toolType: toolType
     });
     cornerstoneTools.rectangleRoiTouch = cornerstoneTools.touchTool({
-        createNewMeasurement: createNewMeasurement, onImageRendered: onImageRendered, pointNearTool: pointNearTool, toolType: toolType
+        createNewMeasurement: createNewMeasurement,
+        onImageRendered: onImageRendered,
+        pointNearTool: pointNearTool,
+        toolType: toolType
     });
 
 })($, cornerstone, cornerstoneMath, cornerstoneTools);
