@@ -1,4 +1,4 @@
-/*! cornerstoneTools - v0.7.6 - 2015-10-07 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+/*! cornerstoneTools - v0.7.6 - 2015-10-08 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -2522,9 +2522,11 @@ if (typeof cornerstoneTools === 'undefined') {
 
         var toolCoords;
         if (eventData.isTouchEvent === true) {
+            var ratio = image.height / enabledElement.canvas.height;
+            console.log ('Image to canvas height ratio: ' + ratio);
             toolCoords = {
                 x: eventData.currentPoints.image.x,
-                y: eventData.currentPoints.image.y - cornerstoneTools.textStyle.getFontSize() * 2
+                y: eventData.currentPoints.image.y - cornerstoneTools.textStyle.getFontSize() * 4 * ratio
             };
         } else {
             toolCoords = eventData.currentPoints.image;
@@ -2851,7 +2853,7 @@ if (typeof cornerstoneTools === 'undefined') {
             // Draw text
 
             var areaText,
-                areaTextWidth;
+                areaTextWidth = 0;
             if (area !== undefined) {
                 areaText = 'Area: ' + area.toFixed(2) + ' mm' + String.fromCharCode(178);
                 areaTextWidth = context.measureText(areaText).width;
@@ -2865,7 +2867,7 @@ if (typeof cornerstoneTools === 'undefined') {
 
             var longestTextWidth = Math.max(meanTextWidth, areaTextWidth, stdDevTextWidth);
 
-            textX = centerX < (eventData.image.columns / 2) ? centerX + (widthCanvas / 2) + longestTextWidth: centerX - (widthCanvas / 2) - longestTextWidth - 5;
+            textX = centerX < (eventData.image.columns / 2) ? centerX + (widthCanvas / 2) + longestTextWidth: centerX - (widthCanvas / 2) - longestTextWidth - 15;
             textY = centerY < (eventData.image.rows / 2) ? centerY + (heightCanvas / 2): centerY - (heightCanvas / 2);
 
             context.fillStyle = color;
