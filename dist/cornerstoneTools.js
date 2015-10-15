@@ -1,4 +1,4 @@
-/*! cornerstoneTools - v0.7.6 - 2015-10-14 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+/*! cornerstoneTools - v0.7.6 - 2015-10-15 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -40,7 +40,14 @@ if (typeof cornerstoneTools === 'undefined') {
         var direction = Math.max(-1, Math.min(1, (wheelDelta)));
 
         var mouseWheelData = {
-            element: element, viewport: cornerstone.getViewport(element), image: cornerstone.getEnabledElement(element).image, direction: direction, pageX: e.pageX || e.originalEvent.pageX, pageY: e.pageY || e.originalEvent.pageY, imageX: startingCoords.x, imageY: startingCoords.y
+            element: element,
+            viewport: cornerstone.getViewport(element),
+            image: cornerstone.getEnabledElement(element).image,
+            direction: direction,
+            pageX: e.pageX || e.originalEvent.pageX,
+            pageY: e.pageY || e.originalEvent.pageY,
+            imageX: startingCoords.x,
+            imageY: startingCoords.y
         };
 
         $(element).trigger('CornerstoneToolsMouseWheel', mouseWheelData);
@@ -58,7 +65,8 @@ if (typeof cornerstoneTools === 'undefined') {
 
     // module exports
     cornerstoneTools.mouseWheelInput = {
-        enable: enable, disable: disable
+        enable: enable,
+        disable: disable
     };
 
 })($, cornerstone, cornerstoneTools);
@@ -487,7 +495,6 @@ if (typeof cornerstoneTools === 'undefined') {
             case 'touchstart':
                 clearTimeout(touchStartDelay);
                 touchStartDelay = setTimeout(function() {
-                    console.log('touchstart, touches: ' + e.originalEvent.touches.length);
                     startPoints = {
                         page: cornerstoneMath.point.pageToPoint(e.originalEvent.touches[0]),
                         image: cornerstone.pageToPixel(element, e.originalEvent.touches[0].pageX, e.originalEvent.touches[0].pageY),
@@ -524,9 +531,11 @@ if (typeof cornerstoneTools === 'undefined') {
                         if (e.originalEvent.touches.length > 1) {
                             eventType = 'CornerstoneToolsMultiTouchStartActive';
                         }
+
                         eventData.type = eventType;
                         $(element).trigger(eventType, eventData);
                     }
+
                     console.log(eventType);
                     lastPoints = cornerstoneTools.copyPoints(startPoints);
                 }, 20);
@@ -3794,11 +3803,13 @@ if (typeof cornerstoneTools === 'undefined') {
         var zoomCtx = magnify.getContext('2d');
         zoomCtx.setTransform(1, 0, 0, 1, 0, 0);
 
+        var getSize = magnifySize / magnificationLevel;
+
         // Calculate the on-canvas location of the mouse pointer / touch
         var canvasLocation = cornerstone.pixelToCanvas(eventData.element, eventData.currentPoints.image);
 
         if (eventData.isTouchEvent === true) {
-            canvasLocation.y -= 0.5 * magnifySize;
+            canvasLocation.y -= 1.25 * getSize;
         }
 
         canvasLocation.x = Math.max(canvasLocation.x, 0);
@@ -3814,7 +3825,6 @@ if (typeof cornerstoneTools === 'undefined') {
         // Fill it with the pixels that the mouse is clicking on
         zoomCtx.fillRect(0, 0, magnifySize, magnifySize);
         
-        var getSize = magnifySize / magnificationLevel;
         var copyFrom = {
             x: canvasLocation.x - 0.5 * getSize,
             y: canvasLocation.y - 0.5 * getSize
@@ -3836,14 +3846,9 @@ if (typeof cornerstoneTools === 'undefined') {
         };
         zoomCtx.drawImage(canvas, copyFrom.x, copyFrom.y, canvas.width - copyFrom.x, canvas.height - copyFrom.y, 0, 0, scaledMagnify.x, scaledMagnify.y);
 
-        if (eventData.isTouchEvent === true) {
-            magnify.style.top = canvasLocation.y - 1 * magnifySize + 'px';
-            magnify.style.left = canvasLocation.x - 0.5 * magnifySize + 'px';
-        } else {
-            // Place the magnification tool at the same location as the pointer
-            magnify.style.top = canvasLocation.y - 0.5 * magnifySize + 'px';
-            magnify.style.left = canvasLocation.x - 0.5 * magnifySize + 'px';
-        }
+        // Place the magnification tool at the same location as the pointer
+        magnify.style.top = canvasLocation.y - 0.5 * magnifySize + 'px';
+        magnify.style.left = canvasLocation.x - 0.5 * magnifySize + 'px';
 
         magnify.style.display = 'block';
 
@@ -6088,7 +6093,10 @@ if (typeof cornerstoneTools === 'undefined') {
                 var image = eventData.image;
                 var handleOutsideImage = false;
                 var rect = {
-                    top: 0, left: 0, width: image.width, height: image.height
+                    top: 0,
+                    left: 0,
+                    width: image.width,
+                    height: image.height
                 };
                 
                 Object.keys(data.handles).forEach(function(name) {
@@ -6245,9 +6253,10 @@ if (typeof cornerstoneTools === 'undefined') {
 
     function moveNewHandleTouch(eventData, handle, doneMoveCallback, preventHandleOutsideImage) {
         var element = eventData.element;
+        var imageCoords = cornerstone.pageToPixel(element, eventData.currentPoints.page.x, eventData.currentPoints.page.y + 50);
         var distanceFromTouch = {
-            x: handle.x - eventData.currentPoints.image.x,
-            y: handle.y - eventData.currentPoints.image.y
+            x: handle.x - imageCoords.x,
+            y: handle.y - imageCoords.y
         };
 
         function moveCallback(e, eventData) {
@@ -6337,7 +6346,10 @@ if (typeof cornerstoneTools === 'undefined') {
                 var image = eventData.image;
                 var handleOutsideImage = false;
                 var rect = {
-                    top: 0, left: 0, width: image.width, height: image.height
+                    top: 0,
+                    left: 0,
+                    width: image.width,
+                    height: image.height
                 };
                 
                 Object.keys(data.handles).forEach(function(name) {
@@ -6466,7 +6478,8 @@ if (typeof cornerstoneTools === 'undefined') {
             var index = that.measurements.push(measurement);
             // fire event
             var eventDetail = {
-                index: index, measurement: measurement
+                index: index,
+                measurement: measurement
             };
             $(that).trigger('CornerstoneMeasurementAdded', eventDetail);
         };
@@ -6476,7 +6489,8 @@ if (typeof cornerstoneTools === 'undefined') {
             that.measurements.splice(index, 1);
             // fire event
             var eventDetail = {
-                index: index, measurement: measurement
+                index: index,
+                measurement: measurement
             };
             $(that).trigger('CornerstoneMeasurementRemoved', eventDetail);
         };
@@ -6671,7 +6685,8 @@ if (typeof cornerstoneTools === 'undefined') {
         renderer = renderer || cornerstoneTools.referenceLines.renderActiveReferenceLine;
 
         cornerstoneTools.addToolState(element, toolType, {
-            synchronizationContext: synchronizationContext, renderer: renderer
+            synchronizationContext: synchronizationContext,
+            renderer: renderer
         });
         $(element).on('CornerstoneImageRendered', onImageRendered);
         cornerstone.updateImage(element);
@@ -6685,7 +6700,8 @@ if (typeof cornerstoneTools === 'undefined') {
 
     // module/private exports
     cornerstoneTools.referenceLines.tool = {
-        enable: enable, disable: disable
+        enable: enable,
+        disable: disable
 
     };
 
@@ -6996,7 +7012,11 @@ if (typeof cornerstoneTools === 'undefined') {
         
         if (playClipToolData === undefined || playClipToolData.data.length === 0) {
             playClipData = {
-                intervalId: undefined, framesPerSecond: framesPerSecond, lastFrameTimeStamp: undefined, frameRate: 0, loop: true
+                intervalId: undefined,
+                framesPerSecond: framesPerSecond,
+                lastFrameTimeStamp: undefined,
+                frameRate: 0,
+                loop: true
             };
             cornerstoneTools.addToolState(element, toolType, playClipData);
         } else {
@@ -7531,7 +7551,8 @@ Display scroll progress bar across bottom of image.
     'use strict';
 
     var keys = {
-        UP: 38, DOWN: 40
+        UP: 38,
+        DOWN: 40
     };
 
     function keyDownCallback(e, eventData) {
@@ -8094,7 +8115,8 @@ Display scroll progress bar across bottom of image.
         }
 
         var imageIdToolStateManager = {
-            get: getStackSpecificToolState, add: addStackSpecificToolState
+            get: getStackSpecificToolState,
+            add: addStackSpecificToolState
         };
         return imageIdToolStateManager;
     }
