@@ -3,6 +3,7 @@
     'use strict';
 
     function moveNewHandleTouch(eventData, handle, doneMoveCallback, preventHandleOutsideImage) {
+        //console.log('moveNewHandleTouch');
         var element = eventData.element;
         var imageCoords = cornerstone.pageToPixel(element, eventData.currentPoints.page.x, eventData.currentPoints.page.y + 50);
         var distanceFromTouch = {

@@ -1,4 +1,4 @@
-/*! cornerstoneTools - v0.7.6 - 2015-10-27 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+/*! cornerstoneTools - v0.7.6 - 2015-10-28 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -377,7 +377,7 @@ if (typeof cornerstoneTools === 'undefined') {
         preventNextPinch = false;
     
     function onTouch(e) {
-        //console.log(e.type);
+        ///console.log(e.type);
         var element = e.target.parentNode,
             event,
             eventType;
@@ -548,7 +548,7 @@ if (typeof cornerstoneTools === 'undefined') {
                         $(element).trigger(eventType, eventData);
                     }
 
-                    // console.log(eventType);
+                    console.log(eventType);
                     lastPoints = cornerstoneTools.copyPoints(startPoints);
                 }, 20);
 
@@ -583,7 +583,7 @@ if (typeof cornerstoneTools === 'undefined') {
                     event = $.Event(eventType, eventData);
                     $(element).trigger(event, eventData);
 
-                    //console.log(eventType);
+                    console.log(eventType);
                 }, pressDelay);
                 break;
 
@@ -759,12 +759,13 @@ if (typeof cornerstoneTools === 'undefined') {
                 break;
         }
 
-        //console.log(eventType);
+        console.log(eventType);
         return false;
     }
 
     function enable(element) {
         disable(element);
+
         var hammerOptions = {
             inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
         };
@@ -793,17 +794,21 @@ if (typeof cornerstoneTools === 'undefined') {
         mc.add([ pan, rotate, pinch ]);
         mc.on('tap doubletap panstart panmove panend pinchstart pinchmove rotatemove', onTouch);
 
-        $(element).data('hammer', mc);
+        cornerstoneTools.preventGhostClick.enable(element);
         $(element).on('touchstart touchend', onTouch);
-        cornerstoneTools.preventGhostClick(element);
+        $(element).data('hammer', mc);
+        console.log('touchInput enabled');
     }
 
     function disable(element) {
+        cornerstoneTools.preventGhostClick.disable(element);
         $(element).off('touchstart touchend', onTouch);
         var mc = $(element).data('hammer');
         if (mc) {
             mc.off('tap doubletap panstart panmove panend pinchmove rotatemove', onTouch);
         }
+
+        console.log('touchInput disabled');
     }
 
     // module exports
@@ -1495,6 +1500,7 @@ if (typeof cornerstoneTools === 'undefined') {
         ///////// BEGIN ACTIVE TOOL ///////
 
         function addNewMeasurement(touchEventData) {
+            console.log('touchTool addNewMeasurement');
             var element = touchEventData.element;
 
             var measurementData = touchToolInterface.createNewMeasurement(touchEventData);
@@ -1539,6 +1545,7 @@ if (typeof cornerstoneTools === 'undefined') {
         }
 
         function touchDownActivateCallback(e, eventData) {
+            console.log('touchTool touchDownActivateCallback');
             if (touchToolInterface.addNewMeasurement) {
                 touchToolInterface.addNewMeasurement(eventData);
             } else {
@@ -1551,6 +1558,7 @@ if (typeof cornerstoneTools === 'undefined') {
 
         ///////// BEGIN INACTIVE TOOL ///////
         function touchMoveCallback(e, eventData) {
+            console.log('touchTool touchMoveCallback');
             cornerstoneTools.toolCoordinates.setCoords(eventData);
       
             // if we have no tool data for this element, do nothing
@@ -1582,6 +1590,7 @@ if (typeof cornerstoneTools === 'undefined') {
         }
 
         function tapCallback(e, eventData) {
+            console.log('touchTool tapCallback');
             var element = eventData.element;
             var coords = eventData.currentPoints.canvas;
             var toolData = cornerstoneTools.getToolState(e.currentTarget, touchToolInterface.toolType);
@@ -1592,6 +1601,7 @@ if (typeof cornerstoneTools === 'undefined') {
             deactivateAllToolInstances(toolData);
 
             function doneMovingCallback() {
+                console.log('touchTool tapCallback doneMovingCallback');
                 deactivateAllToolInstances(toolData);
                 if (cornerstoneTools.anyHandlesOutsideImage(eventData, data.handles)) {
                     // delete the measurement
@@ -1653,6 +1663,7 @@ if (typeof cornerstoneTools === 'undefined') {
         }
 
         function touchStartCallback(e, eventData) {
+            console.log('touchTool touchStartCallback');
             var element = eventData.element;
             var coords = eventData.startPoints.canvas;
             var data;
@@ -1660,6 +1671,7 @@ if (typeof cornerstoneTools === 'undefined') {
             var i;
 
             function doneMovingCallback() {
+                console.log('touchTool touchStartCallback doneMovingCallback');
                 data.active = false;
                 data.invalidated = true;
                 if (cornerstoneTools.anyHandlesOutsideImage(eventData, data.handles)) {
@@ -1752,6 +1764,8 @@ if (typeof cornerstoneTools === 'undefined') {
 
         // visible, interactive and can create
         function activate(element) {
+            console.log('activate touchTool');
+
             $(element).off('CornerstoneImageRendered', touchToolInterface.onImageRendered);
             $(element).off('CornerstoneToolsTouchDrag', touchToolInterface.touchMoveCallback || touchMoveCallback);
             $(element).off('CornerstoneToolsTouchStart', touchToolInterface.touchStartCallback || touchStartCallback);
@@ -1779,6 +1793,8 @@ if (typeof cornerstoneTools === 'undefined') {
 
         // visible, interactive
         function deactivate(element) {
+            console.log('deactivate touchTool');
+            
             $(element).off('CornerstoneImageRendered', touchToolInterface.onImageRendered);
             $(element).off('CornerstoneToolsTouchDrag', touchToolInterface.touchMoveCallback || touchMoveCallback);
             $(element).off('CornerstoneToolsTouchStart', touchToolInterface.touchStartCallback || touchStartCallback);
@@ -2261,7 +2277,7 @@ if (typeof cornerstoneTools === 'undefined') {
         var measurementData = createNewMeasurement(touchEventData);
         cornerstoneTools.addToolState(element, toolType, measurementData);
         $(element).off('CornerstoneToolsTouchDrag', cornerstoneTools.arrowAnnotateTouch.touchMoveCallback);
-        $(element).off('CornerstoneToolsDragStartActive', cornerstoneTools.arrowAnnotateTouch.touchDownActivateCallback);
+        $(element).off('CornerstoneToolsTouchStartActive', cornerstoneTools.arrowAnnotateTouch.touchDownActivateCallback);
         $(element).off('CornerstoneToolsTap', cornerstoneTools.arrowAnnotateTouch.tapCallback);
         cornerstone.updateImage(element);
 
@@ -2279,7 +2295,7 @@ if (typeof cornerstoneTools === 'undefined') {
             }
 
             $(element).on('CornerstoneToolsTouchDrag', cornerstoneTools.arrowAnnotateTouch.touchMoveCallback);
-            $(element).on('CornerstoneToolsDragStartActive', cornerstoneTools.arrowAnnotateTouch.touchDownActivateCallback);
+            $(element).on('CornerstoneToolsTouchStartActive', cornerstoneTools.arrowAnnotateTouch.touchDownActivateCallback);
             $(element).on('CornerstoneToolsTap', cornerstoneTools.arrowAnnotateTouch.tapCallback);
         });
     }
@@ -5927,47 +5943,71 @@ if (typeof cornerstoneTools === 'undefined') {
     // All credit to @kosich
     // https://gist.github.com/kosich/23188dd86633b6c2efb7
 
-    var antiGhostDelay = 2000;
+    var antiGhostDelay = 2000,
+        pointerType = {
+            mouse: 0,
+            touch: 1
+        },
+        lastInteractionType,
+        lastInteractionTime;
 
-    var pointerType = {
-        mouse: 0,
-        touch: 1
-    };
-
-    function preventGhostClick(element) {
-        var lastInteractionType,
-            lastInteractionTime;
-
-        function handleTap(type, e) {
-            var now = Date.now();
-            if (type !== lastInteractionType) {
-                if (now - lastInteractionTime <= antiGhostDelay) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-
-                lastInteractionType = type;
+    function handleTap(type, e) {
+        console.log('preventGhostClick handleTap, type: ' + type);
+        var now = Date.now();
+        if (type !== lastInteractionType) {
+            if (now - lastInteractionTime <= antiGhostDelay) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
             }
 
-            lastInteractionTime = now;
+            lastInteractionType = type;
         }
 
-        function attachEvents(eventList, interactionType) {
-            eventList.forEach(function(eventName) {
-                element.addEventListener(eventName, handleTap.bind(null, interactionType), true);
-            });
-        }
-
-        var mouseEvents = [ 'mousedown', 'mouseup', 'mousemove' ];
-        var touchEvents = [ 'touchstart', 'touchend' ];
-
-        attachEvents(mouseEvents, pointerType.mouse);
-        attachEvents(touchEvents, pointerType.touch);
+        lastInteractionTime = now;
     }
 
-    cornerstoneTools.preventGhostClick = preventGhostClick;
+    // Cacheing the function references
+    // Necessary because a new function reference is created after .bind() is called
+    // http://stackoverflow.com/questions/11565471/removing-event-listener-which-was-added-with-bind
+    var handleTapMouse = handleTap.bind(null, pointerType.mouse);
+    var handleTapTouch = handleTap.bind(null, pointerType.touch);
+
+    function attachEvents(element, eventList, interactionType) {
+        var tapHandler = interactionType ? handleTapMouse : handleTapTouch;
+        eventList.forEach(function(eventName) {
+            element.addEventListener(eventName, tapHandler, true);
+        });
+    }
+
+    function removeEvents(element, eventList, interactionType) {
+        var tapHandler = interactionType ? handleTapMouse : handleTapTouch;
+        eventList.forEach(function(eventName) {
+            element.removeEventListener(eventName, tapHandler, true);
+        });
+    }
+
+    var mouseEvents = [ 'mousedown', 'mouseup', 'mousemove' ];
+    var touchEvents = [ 'touchstart', 'touchend' ];
+
+    function disable(element) {
+        console.log('preventGhostClick disabled');
+        removeEvents(element, mouseEvents, pointerType.mouse);
+        removeEvents(element, touchEvents, pointerType.touch);
+    }
+
+    function enable(element) {
+        disable(element);
+        console.log('preventGhostClick enabled');
+        attachEvents(element, mouseEvents, pointerType.mouse);
+        attachEvents(element, touchEvents, pointerType.touch);
+    }
+
+    cornerstoneTools.preventGhostClick = {
+        enable: enable,
+        disable: disable
+    };
 
 })(cornerstoneTools);
  
@@ -6343,6 +6383,7 @@ if (typeof cornerstoneTools === 'undefined') {
     'use strict';
 
     function moveNewHandleTouch(eventData, handle, doneMoveCallback, preventHandleOutsideImage) {
+        console.log('moveNewHandleTouch');
         var element = eventData.element;
         var imageCoords = cornerstone.pageToPixel(element, eventData.currentPoints.page.x, eventData.currentPoints.page.y + 50);
         var distanceFromTouch = {
@@ -6408,6 +6449,7 @@ if (typeof cornerstoneTools === 'undefined') {
     'use strict';
 
     function touchMoveAllHandles(touchEventData, data, toolData, deleteIfHandleOutsideImage, doneMovingCallback) {
+        console.log('touchMoveAllHandles');
         var element = touchEventData.element;
 
         function touchDragCallback(e, eventData) {
@@ -6429,6 +6471,7 @@ if (typeof cornerstoneTools === 'undefined') {
             data.invalidated = false;
 
             $(element).off('CornerstoneToolsTouchDrag', touchDragCallback);
+            $(element).off('CornerstoneToolsTouchPress', touchEndCallback);
             $(element).off('CornerstoneToolsDragEnd', touchEndCallback);
             $(element).off('CornerstoneToolsTap', touchEndCallback);
 
@@ -6470,6 +6513,7 @@ if (typeof cornerstoneTools === 'undefined') {
             cornerstone.updateImage(element);
         }
 
+        $(element).on('CornerstoneToolsTouchPress', touchEndCallback);
         $(element).on('CornerstoneToolsDragEnd', touchEndCallback);
         $(element).on('CornerstoneToolsTap', touchEndCallback);
         return true;
@@ -6488,6 +6532,7 @@ if (typeof cornerstoneTools === 'undefined') {
     'use strict';
 
     function touchMoveHandle(touchEventData, handle, doneMovingCallback) {
+        console.log('touchMoveHandle');
         var element = touchEventData.element;
         var distanceFromTouch = {
             x: handle.x - touchEventData.currentPoints.image.x,
