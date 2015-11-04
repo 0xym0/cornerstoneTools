@@ -80,20 +80,31 @@
 
         //activation color 
         var color;
-        var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
-        var font = cornerstoneTools.textStyle.getFont();
-        var fontHeight = cornerstoneTools.textStyle.getFontSize();
+        var lineWidth;
+        var font = cornerstoneTools.toolStyle.getFont();
+        var fontHeight = parseInt(cornerstoneTools.toolStyle.getFontSize());
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
         
         for (var i = 0; i < toolData.data.length; i++) {
             context.save();
+
+            // configurable shadow
+            if (shadowColor !== 'transparent') {
+                context.shadowColor = shadowColor;
+                context.shadowOffsetX = shadowOffset[0];
+                context.shadowOffsetY = shadowOffset[1];
+            }
 
             var data = toolData.data[i];
 
             //differentiate the color of activation tool
             if (data.active) {
-                color = cornerstoneTools.toolColors.getActiveColor();
+                color = cornerstoneTools.toolStyle.getActiveColor();
+                lineWidth = cornerstoneTools.toolStyle.getActiveWidth();
             } else {
-                color = cornerstoneTools.toolColors.getToolColor();
+                color = cornerstoneTools.toolStyle.getToolColor();
+                lineWidth = cornerstoneTools.toolStyle.getToolWidth();
             }
 
             // draw the rectangle

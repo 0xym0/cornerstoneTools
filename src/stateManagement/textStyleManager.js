@@ -3,32 +3,36 @@
     'use strict';
 
     function textStyleManager() {
-        var defaultFontSize = 15,
-            defaultFont = defaultFontSize + 'px Arial',
-            defaultBackgroundColor = 'transparent';
 
         function setFont(font) {
-            defaultFont = font;
+            var params = font.split(' ', 3);
+            if (params.length === 3) {
+                cornerstoneTools.toolStyle.setFont(params[0], params[1], params[2]);
+            } else if (params.length === 2) {
+                cornerstoneTools.toolStyle.setFont('', params[0], params[1]);
+            } else {
+                cornerstoneTools.toolStyle.setFont('', '', params[0]);
+            }
         }
 
         function getFont() {
-            return defaultFont;
+            return cornerstoneTools.toolStyle.getFont();
         }
 
         function setFontSize(fontSize) {
-            defaultFontSize = fontSize;
+            cornerstoneTools.toolStyle.setFontSize(fontSize + 'px');
         }
 
         function getFontSize() {
-            return defaultFontSize;
+            return parseInt(cornerstoneTools.toolStyle.getFontSize());
         }
 
         function setBackgroundColor(backgroundColor) {
-            defaultBackgroundColor = backgroundColor;
+            cornerstoneTools.toolStyle.setFontBackgroundColor(backgroundColor);
         }
 
         function getBackgroundColor() {
-            return defaultBackgroundColor;
+            return cornerstoneTools.toolStyle.getFontBackgroundColor();
         }
 
         var textStyle = {

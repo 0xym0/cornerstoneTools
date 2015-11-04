@@ -213,7 +213,7 @@
         context.setTransform(1, 0, 0, 1, 0, 0);
 
         // Set to the active tool color
-        var color = cornerstoneTools.toolColors.getActiveColor();
+        var color = cornerstoneTools.toolStyle.getActiveColor();
         
         // Calculate the rectangle parameters
         var startPointCanvas = cornerstone.pixelToCanvas(eventData.element, startPoint);
@@ -225,15 +225,16 @@
         var height = Math.abs(startPointCanvas.y - endPointCanvas.y);
 
         var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
-        var config = cornerstoneTools.wwwcRegion.getConfiguration();
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
 
         // Draw the rectangle
         context.save();
 
-        if (config && config.shadow) {
-            context.shadowColor = config.shadowColor || '#000000';
-            context.shadowOffsetX = config.shadowOffsetX || 1;
-            context.shadowOffsetY = config.shadowOffsetY || 1;
+        if (shadowColor !== 'transparent') {
+            context.shadowColor = shadowColor;
+            context.shadowOffsetX = shadowOffset[0];
+            context.shadowOffsetY = shadowOffset[1];
         }
 
         context.beginPath();

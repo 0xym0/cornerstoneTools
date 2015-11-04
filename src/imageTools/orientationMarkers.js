@@ -64,7 +64,7 @@
         var context = eventData.canvasContext.canvas.getContext('2d');
         context.setTransform(1, 0, 0, 1, 0, 0);
 
-        var color = cornerstoneTools.toolColors.getToolColor();
+        var color = cornerstoneTools.toolStyle.getToolColor();
 
         var textWidths = {
             top: context.measureText(markers.top).width, left: context.measureText(markers.left).width, right: context.measureText(markers.right).width, bottom: context.measureText(markers.bottom).width

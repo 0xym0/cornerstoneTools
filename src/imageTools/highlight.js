@@ -71,8 +71,17 @@
 
         var color;
         var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
 
         context.save();
+
+        // configurable shadow
+        if (shadowColor !== 'transparent') {
+            context.shadowColor = shadowColor;
+            context.shadowOffsetX = shadowOffset[0];
+            context.shadowOffsetY = shadowOffset[1];
+        }
 
         var data = toolData.data[0];
 
@@ -81,9 +90,9 @@
         }
 
         if (data.active) {
-            color = cornerstoneTools.toolColors.getActiveColor();
+            color = cornerstoneTools.toolStyle.getActiveColor();
         } else {
-            color = cornerstoneTools.toolColors.getToolColor();
+            color = cornerstoneTools.toolStyle.getToolColor();
         }
 
         var handleStartCanvas = cornerstone.pixelToCanvas(eventData.element, data.handles.start);

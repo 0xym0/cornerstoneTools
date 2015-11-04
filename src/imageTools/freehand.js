@@ -275,20 +275,29 @@
         context.setTransform(1, 0, 0, 1, 0, 0);
 
         var color;
-        var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
-        var fillColor = cornerstoneTools.toolColors.getFillColor();
+        var lineWidth;
+        var fillColor = cornerstoneTools.toolStyle.getFillColor();
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
 
         for (var i = 0; i < toolData.data.length; i++) {
             context.save();
 
+            // configurable shadow
+            if (shadowColor !== 'transparent') {
+                context.shadowColor = shadowColor;
+                context.shadowOffsetX = shadowOffset[0];
+                context.shadowOffsetY = shadowOffset[1];
+            }
+
             var data = toolData.data[i];
 
             if (data.active) {
-                color = cornerstoneTools.toolColors.getActiveColor();
-                fillColor = cornerstoneTools.toolColors.getFillColor();
+                color = cornerstoneTools.toolStyle.getActiveColor();
+                lineWidth = cornerstoneTools.toolStyle.getActiveWidth();
             } else {
-                color = cornerstoneTools.toolColors.getToolColor();
-                fillColor = cornerstoneTools.toolColors.getToolColor();
+                color = cornerstoneTools.toolStyle.getToolColor();
+                lineWidth = cornerstoneTools.toolStyle.getToolWidth();
             }
 
             var handleStart;

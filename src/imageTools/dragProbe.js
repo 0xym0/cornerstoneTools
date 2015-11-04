@@ -10,17 +10,18 @@
         var context = enabledElement.canvas.getContext('2d');
         context.setTransform(1, 0, 0, 1, 0, 0);
 
-        var color = cornerstoneTools.toolColors.getActiveColor();
-        var font = cornerstoneTools.textStyle.getFont();
-        var fontHeight = cornerstoneTools.textStyle.getFontSize();
-        var config = cornerstoneTools.dragProbe.getConfiguration();
+        var color = cornerstoneTools.toolStyle.getActiveColor();
+        var font = cornerstoneTools.toolStyle.getFont();
+        var fontHeight = parseInt(cornerstoneTools.toolStyle.getFontSize());
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
 
         context.save();
 
-        if (config && config.shadow) {
-            context.shadowColor = config.shadowColor || '#000000';
-            context.shadowOffsetX = config.shadowOffsetX || 1;
-            context.shadowOffsetY = config.shadowOffsetY || 1;
+        if (shadowColor !== 'transparent') {
+            context.shadowColor = shadowColor;
+            context.shadowOffsetX = shadowOffset[0];
+            context.shadowOffsetY = shadowOffset[1];
         }
 
         var x = Math.round(eventData.currentPoints.image.x);
@@ -75,16 +76,17 @@
         var context = enabledElement.canvas.getContext('2d');
         context.setTransform(1, 0, 0, 1, 0, 0);
 
-        var color = cornerstoneTools.toolColors.getActiveColor();
-        var font = cornerstoneTools.textStyle.getFont();
-        var config = cornerstoneTools.dragProbe.getConfiguration();
-        
+        var color = cornerstoneTools.toolStyle.getActiveColor();
+        var font = cornerstoneTools.toolStyle.getFont();
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
+
         context.save();
 
-        if (config && config.shadow) {
-            context.shadowColor = config.shadowColor || '#000000';
-            context.shadowOffsetX = config.shadowOffsetX || 1;
-            context.shadowOffsetY = config.shadowOffsetY || 1;
+        if (shadowColor !== 'transparent') {
+            context.shadowColor = shadowColor;
+            context.shadowOffsetX = shadowOffset[0];
+            context.shadowOffsetY = shadowOffset[1];
         }
 
         var x = Math.round(eventData.currentPoints.image.x);

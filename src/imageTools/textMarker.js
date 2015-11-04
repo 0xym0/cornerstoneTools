@@ -78,24 +78,28 @@
         var context = eventData.canvasContext.canvas.getContext('2d');
         context.setTransform(1, 0, 0, 1, 0, 0);
 
-        var font = cornerstoneTools.textStyle.getFont();
-        var fontSize = cornerstoneTools.textStyle.getFontSize();
-        var config = cornerstoneTools.textMarker.getConfiguration();
+        var color;
+        var font = cornerstoneTools.toolStyle.getFont();
+        var fontSize = parseInt(cornerstoneTools.toolStyle.getFontSize());
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
 
         for (var i = 0; i < toolData.data.length; i++) {
-            var data = toolData.data[i];
-
-            var color = cornerstoneTools.toolColors.getToolColor();
-            if (data.active) {
-                color = cornerstoneTools.toolColors.getActiveColor();
-            }
-
             context.save();
 
-            if (config && config.shadow) {
-                context.shadowColor = config.shadowColor || '#000000';
-                context.shadowOffsetX = config.shadowOffsetX || 1;
-                context.shadowOffsetY = config.shadowOffsetY || 1;
+            // configurable shadow
+            if (shadowColor !== 'transparent') {
+                context.shadowColor = shadowColor;
+                context.shadowOffsetX = shadowOffset[0];
+                context.shadowOffsetY = shadowOffset[1];
+            }
+
+            var data = toolData.data[i];
+
+            if (data.active) {
+                color = cornerstoneTools.toolStyle.getActiveColor();
+            } else {
+                color = cornerstoneTools.toolStyle.getToolColor();
             }
 
             // Draw text

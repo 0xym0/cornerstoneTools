@@ -36,7 +36,7 @@
         var measurementData = createNewMeasurement(mouseEventData);
 
         var eventData = {
-            mouseButtonMask: mouseEventData.which,
+            mouseButtonMask: mouseEventData.which
         };
         
         // associate this data with this imageId so we can render it and manipulate it
@@ -139,25 +139,30 @@
         context.setTransform(1, 0, 0, 1, 0, 0);
 
         var color;
-        var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
-        var font = cornerstoneTools.textStyle.getFont();
+        var lineWidth;
+        var font = cornerstoneTools.toolStyle.getFont();
+        var shadowColor = cornerstoneTools.toolStyle.getShadowColor();
+        var shadowOffset = cornerstoneTools.toolStyle.getShadowOffset();
         var config = cornerstoneTools.arrowAnnotate.getConfiguration();
 
         for (var i = 0; i < toolData.data.length; i++) {
             context.save();
 
-            if (config && config.shadow) {
-                context.shadowColor = config.shadowColor || '#000000';
-                context.shadowOffsetX = config.shadowOffsetX || 1;
-                context.shadowOffsetY = config.shadowOffsetY || 1;
+            // configurable shadow
+            if (shadowColor !== 'transparent') {
+                context.shadowColor = shadowColor;
+                context.shadowOffsetX = shadowOffset[0];
+                context.shadowOffsetY = shadowOffset[1];
             }
 
             var data = toolData.data[i];
 
             if (data.active) {
-                color = cornerstoneTools.toolColors.getActiveColor();
+                color = cornerstoneTools.toolStyle.getActiveColor();
+                lineWidth = cornerstoneTools.toolStyle.getActiveWidth();
             } else {
-                color = cornerstoneTools.toolColors.getToolColor();
+                color = cornerstoneTools.toolStyle.getToolColor();
+                lineWidth = cornerstoneTools.toolStyle.getToolWidth();
             }
             
             // Draw the arrow

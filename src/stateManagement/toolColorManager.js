@@ -2,33 +2,30 @@
 
     'use strict';
 
-    function toolColorManager(){
-        var defaultColor = 'white',
-            activeColor = 'greenyellow',
-            fillColor = 'transparent';
+    function toolColorManager() {
 
-        function setFillColor(color){
-            fillColor = color;
+        function setFillColor(color) {
+            cornerstoneTools.toolStyle.setFillColor(color);
         }
 
-        function getFillColor(){
-            return fillColor;
+        function getFillColor() {
+            return cornerstoneTools.toolStyle.getFillColor();
         }
 
-        function setToolColor(color){
-            defaultColor = color;
+        function setToolColor(color) {
+            cornerstoneTools.toolStyle.setToolColor(color);
         }
 
-        function getToolColor(){
-            return defaultColor;
+        function getToolColor() {
+            return cornerstoneTools.toolStyle.getToolColor();
         }
 
-        function setActiveToolColor(color){
-            activeColor = color;
+        function setActiveToolColor(color) {
+            cornerstoneTools.toolStyle.setActiveColor(color);
         }
 
-        function getActiveToolColor(){
-            return activeColor;
+        function getActiveToolColor() {
+            return cornerstoneTools.toolStyle.getActiveColor();
         }
 
         var toolColors = {
